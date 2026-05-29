@@ -128,9 +128,21 @@ p {
 }
 
 .control-grid,
-.measure-list {
+.measure-list,
+.view-buttons {
   display: grid;
   gap: 14px;
+}
+
+.view-buttons {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.view-buttons button {
+  min-height: 38px;
+  border-radius: 8px;
+  font-weight: 700;
 }
 
 .control-grid label,
@@ -267,8 +279,7 @@ input[type="number"] {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background:
-    linear-gradient(180deg, #dbe8ef 0%, #f6f8f9 58%, #e8ecef 100%);
+  background: #dbe8ef;
   box-shadow: var(--shadow);
 }
 

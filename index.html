@@ -24,19 +24,11 @@
               <span aria-hidden="true">R</span>
             </button>
           </div>
-          <div class="control-grid">
-            <label>
-              <span>Rotation</span>
-              <input id="rotation" type="range" min="-180" max="180" value="-35" />
-            </label>
-            <label>
-              <span>Tilt</span>
-              <input id="tilt" type="range" min="15" max="70" value="38" />
-            </label>
-            <label>
-              <span>Zoom</span>
-              <input id="zoom" type="range" min="35" max="120" value="68" />
-            </label>
+          <div class="view-buttons">
+            <button data-view="front">Front</button>
+            <button data-view="rear">Rear</button>
+            <button data-view="side">Side</button>
+            <button data-view="top">Plan</button>
           </div>
         </section>
 
@@ -48,6 +40,7 @@
             <label><input id="showRoof" type="checkbox" checked /> Roof shell</label>
             <label><input id="showDims" type="checkbox" checked /> Dimensions</label>
             <label><input id="showContext" type="checkbox" checked /> Garden / drive</label>
+            <label><input id="showCutaway" type="checkbox" /> Cutaway mode</label>
           </div>
         </section>
 
@@ -59,6 +52,7 @@
             <button data-scenario="dormer">Dormer</button>
           </div>
           <div class="metrics" id="scenarioMetrics"></div>
+          <p class="note">This is a planning massing model, not a surveyed CAD file.</p>
         </section>
 
         <section class="panel">
