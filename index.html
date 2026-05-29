@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>House Renovation Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">H</span>
+          <div>
+            <h1>House Studio</h1>
+            <p>Private house renovation model</p>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>View</h2>
+            <button class="icon-button" id="resetView" title="Reset view" aria-label="Reset view">
+              <span aria-hidden="true">R</span>
+            </button>
+          </div>
+          <div class="control-grid">
+            <label>
+              <span>Rotation</span>
+              <input id="rotation" type="range" min="-180" max="180" value="-35" />
+            </label>
+            <label>
+              <span>Tilt</span>
+              <input id="tilt" type="range" min="15" max="70" value="38" />
+            </label>
+            <label>
+              <span>Zoom</span>
+              <input id="zoom" type="range" min="35" max="120" value="68" />
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Layers</h2>
+          <div class="toggle-list">
+            <label><input id="showGround" type="checkbox" checked /> Ground floor</label>
+            <label><input id="showFirst" type="checkbox" checked /> First floor</label>
+            <label><input id="showRoof" type="checkbox" checked /> Roof shell</label>
+            <label><input id="showDims" type="checkbox" checked /> Dimensions</label>
+            <label><input id="showContext" type="checkbox" checked /> Garden / drive</label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Loft Scenario</h2>
+          <div class="segmented" role="group" aria-label="Loft scenario">
+            <button class="active" data-scenario="existing">Now</button>
+            <button data-scenario="velux">Velux</button>
+            <button data-scenario="dormer">Dormer</button>
+          </div>
+          <div class="metrics" id="scenarioMetrics"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Measurements</h2>
+          <div class="measure-list">
+            <label>Width <input id="houseWidth" type="number" step="0.1" value="8.3" /> m</label>
+            <label>Depth <input id="houseDepth" type="number" step="0.1" value="7.3" /> m</label>
+            <label>Ridge <input id="ridgeHeight" type="number" step="0.1" value="7.0" /> m</label>
+            <label>Storey <input id="storeyHeight" type="number" step="0.1" value="2.5" /> m</label>
+          </div>
+          <button class="text-button" id="applyMeasurements">Apply Measurements</button>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Interactive renovation model</p>
+            <h2>Whole-house planning canvas</h2>
+          </div>
+          <div class="actions">
+            <button id="exportImage">Export PNG</button>
+            <button id="copyBrief">Copy Render Brief</button>
+          </div>
+        </header>
+
+        <section class="canvas-wrap">
+          <canvas id="houseCanvas" width="1400" height="900" aria-label="3D model canvas"></canvas>
+          <div class="canvas-hint">Drag to orbit. Scroll to zoom. Toggle renovation options on the left.</div>
+        </section>
+
+        <section class="lower-grid">
+          <article class="panel ideas">
+            <div class="panel-heading">
+              <h2>Renovation Ideas</h2>
+              <button class="icon-button" id="addIdea" title="Add idea" aria-label="Add idea">+</button>
+            </div>
+            <div id="ideasList"></div>
+          </article>
+
+          <article class="panel render-panel">
+            <h2>Photoreal Render Brief</h2>
+            <textarea id="renderBrief" spellcheck="false"></textarea>
+            <p class="note">Use this brief with private reference photos in an image tool to generate realistic renovation visuals.</p>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
