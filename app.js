@@ -216,9 +216,10 @@ function buildHouse() {
   if (state.showRoof) {
     roof("left main pitched roof", leftX, 0, leftW + 0.35, c.depth + 0.5, eave, c.ridge);
     roof("right shorter pitched roof", rightX, rightZ, rightW + 0.35, c.rightDepth + 0.5, eave, c.ridge - 0.35);
-    roof("front cross gable", 0, frontZ - 0.28, 2.55, 1.6, eave + 0.02, c.ridge + 0.18);
-    roof("rear garden cross gable", -1.0, c.depth / 2 + 0.12, 2.95, 1.35, eave + 0.02, c.ridge + 0.05);
   }
+
+  gableFacade("front central gable face", 0, frontZ - 0.24, 2.65, eave, c.ridge + 0.12, 0);
+  gableFacade("rear garden gable face", -1.0, c.depth / 2 + 0.24, 2.95, eave, c.ridge, Math.PI);
 
   addLoftScenario(c);
 }
@@ -298,6 +299,34 @@ function addLoftScenario(c) {
   if (state.scenario !== "existing") {
     box("loft usable zone", [3.7, 0.08, 3.2], [-1.55, eave + 0.06, 0.8], mats.ghost);
   }
+}
+
+function gableFacade(name, cx, z, width, eave, ridge, rotY) {
+  const half = width / 2;
+  const verts = new Float32Array([
+    -half, 0, 0,
+    half, 0, 0,
+    0, ridge - eave, 0,
+  ]);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+  geo.setIndex([0, 1, 2]);
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, mats.brick);
+  mesh.name = name;
+  mesh.position.set(cx, eave, z);
+  mesh.rotation.y = rotY;
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  model.add(mesh);
+
+  const edge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(geo),
+    new THREE.LineBasicMaterial({ color: 0xf4f1e8, linewidth: 2 }),
+  );
+  edge.position.copy(mesh.position);
+  edge.rotation.copy(mesh.rotation);
+  model.add(edge);
 }
 
 function roofLight(x, y, z) {
