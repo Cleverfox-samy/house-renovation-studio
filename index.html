@@ -1,114 +1,357 @@
-<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>House Renovation Studio</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <main class="app-shell">
-      <aside class="sidebar">
-        <div class="brand">
-          <span class="brand-mark">H</span>
-          <div>
-            <h1>House Studio</h1>
-            <p>Private house renovation model</p>
-          </div>
-        </div>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>House Renovation Studio</title>
+<style>
+  :root{--ink:#16140f;--paper:#efe7d6;--line:#6b6353;--accent:#d8a23e;--glass:rgba(28,25,18,.72);}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;background:var(--ink);}
+  body{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;color:var(--paper);position:fixed;inset:0;}
+  #scene{position:absolute;inset:0;display:block;touch-action:none;}
+  #bg{position:absolute;inset:0;z-index:0;background:radial-gradient(120% 90% at 50% 16%,#2c281e 0%,#16140f 55%,#0c0b08 100%);}
+  #bg:after{content:"";position:absolute;inset:0;opacity:.05;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:34px 34px;}
+  .panel{position:absolute;z-index:5;background:var(--glass);-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);border:1px solid rgba(216,162,62,.28);border-radius:14px;}
+  #head{top:14px;left:14px;right:14px;padding:12px 16px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  #head h1{font-size:18px;letter-spacing:.3px;font-weight:600;}
+  #head .sub{font-family:ui-monospace,"JetBrains Mono",Menlo,monospace;font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;}
+  #head .tag{margin-left:auto;font-family:ui-monospace,monospace;font-size:10.5px;color:#b8ad97;border:1px solid rgba(216,162,62,.3);padding:3px 8px;border-radius:20px;}
+  #ctrl{left:14px;bottom:14px;width:226px;padding:13px 15px 15px;}
+  #ctrl h2{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+  #ctrl h2:not(:first-child){margin-top:14px;}
+  .row{display:flex;align-items:center;gap:10px;padding:4.5px 0;cursor:pointer;font-size:14.5px;user-select:none;}
+  .row .dot{width:13px;height:13px;border-radius:4px;border:1.5px solid var(--line);flex:none;transition:.15s;position:relative;}
+  .row.radio .dot{border-radius:50%;}
+  .row.on .dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(216,162,62,.16);}
+  .row.on .dot:after{content:"";position:absolute;inset:2px;border-radius:2px;background:var(--ink);}
+  .row.radio.on .dot:after{border-radius:50%;}
+  .row.on{color:#fff;}
+  .row .sw{margin-left:auto;font-family:ui-monospace,monospace;font-size:10px;color:#857c69;}
+  .btn{margin-top:13px;width:100%;padding:9px;border-radius:9px;cursor:pointer;background:transparent;border:1px solid rgba(216,162,62,.4);color:var(--accent);font-family:ui-monospace,monospace;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;transition:.15s;}
+  .btn:hover{background:rgba(216,162,62,.12);}
+  #legend{right:14px;bottom:14px;padding:12px 14px;max-width:188px;}
+  #legend h2{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+  #legend p{font-size:12.5px;line-height:1.5;color:#cfc6b2;}
+  #legend .note{margin-top:9px;font-family:ui-monospace,monospace;font-size:10px;color:#9a907b;line-height:1.45;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;}
+  #hint{position:absolute;z-index:5;left:50%;bottom:14px;transform:translateX(-50%);font-family:ui-monospace,monospace;font-size:10.5px;color:#8d8470;pointer-events:none;opacity:.9;text-align:center;}
+  @media (max-width:760px){#ctrl{width:184px;}#legend{display:none;}#head .tag{display:none;}#hint{display:none;}}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<canvas id="scene"></canvas>
+<div id="head" class="panel">
+  <h1>House Renovation Studio</h1>
+  <span class="sub">Detached &middot; 3 bed &middot; working model</span>
+  <span class="tag">HD model &middot; roof, rooms, loft options</span>
+</div>
+<div id="ctrl" class="panel">
+  <h2>Floors</h2>
+  <div class="row on" data-toggle="ground"><span class="dot"></span>Ground floor<span class="sw">G</span></div>
+  <div class="row on" data-toggle="first"><span class="dot"></span>First floor<span class="sw">1</span></div>
+  <div class="row on" data-toggle="loft"><span class="dot"></span>Roof &amp; loft<span class="sw">2</span></div>
+  <h2>Shell</h2>
+  <div class="row on" data-toggle="walls"><span class="dot"></span>Walls &amp; cladding<span class="sw">W</span></div>
+  <div class="row on" data-toggle="garage"><span class="dot"></span>Garage<span class="sw">R</span></div>
+  <div class="row on" data-toggle="dims"><span class="dot"></span>Dimensions<span class="sw">D</span></div>
+  <h2>Loft conversion</h2>
+  <div class="row radio on" data-scenario="none"><span class="dot"></span>As built</div>
+  <div class="row radio" data-scenario="velux"><span class="dot"></span>Velux (rear slope)</div>
+  <div class="row radio" data-scenario="dormer"><span class="dot"></span>Rear dormer</div>
+  <button class="btn" id="reset">Reset view</button>
+</div>
+<div id="legend" class="panel">
+  <h2>Reading it</h2>
+  <p>Drag to orbit &middot; pinch / scroll to zoom. The longer side is 7.3m deep, with a set-back garage-side mass, blank gable end, chimney, continuous ridge, and loft conversion options.</p>
+  <p class="note">Footprint from the sketch; roof and extras are approximate. Use this as a working model, not a surveyed drawing.</p>
+</div>
+<div id="hint">drag to rotate &middot; scroll to zoom</div>
 
-        <section class="panel">
-          <div class="panel-heading">
-            <h2>View</h2>
-            <button class="icon-button" id="resetView" title="Reset view" aria-label="Reset view">
-              <span aria-hidden="true">R</span>
-            </button>
-          </div>
-          <div class="view-buttons">
-            <button data-view="front">Front</button>
-            <button data-view="rear">Rear</button>
-            <button data-view="side">Side</button>
-            <button data-view="top">Plan</button>
-          </div>
-        </section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ============================================================
+   CONFIG (metres). Footprint from the hand sketch; roof + extras from photos.
+   ============================================================ */
+const CONFIG = {
+  width:8.3, depth:7.3, storey:2.5, floors:2,
+  eaveY:5.0, ridgeY:7.0,
+  hipInset:3.0,                       // right (garage/long) end hips in by this much
+  bay:{w:3.0, cx:0.0, proj:0.8},     // front entrance cross-gable (centred)
+  rbay:{w:3.0, cx:-0.3, proj:0.8},    // (unused)
+  garage:{w:3.2, d:5.2, h:2.5, setback:4.6},
+  rearWing:{w:3.4, d:1.9, cx:-1.65}     // full-height rear-left wing -> L-shape, roof to ridge
+};
+const ROOMS = {
+  ground:[
+    {n:"Lounge",          r:[0.0,0.0,4.0,5.6]},
+    {n:"Hall Â· Stairs",   r:[4.0,0.0,6.0,3.0]},
+    {n:"Study",           r:[6.0,0.0,8.3,3.0]},
+    {n:"Kitchen / Diner", r:[4.0,3.0,8.3,7.3]}
+  ],
+  first:[
+    {n:"Bedroom 3",r:[0.0,0.0,4.0,2.8]},
+    {n:"Bath",     r:[0.0,2.8,4.0,5.6]},
+    {n:"Bedroom 1",r:[4.0,0.0,8.3,3.8]},
+    {n:"Bedroom 2",r:[4.0,3.8,8.3,7.3]}
+  ]
+};
+/* ============================================================ */
+const W=CONFIG.width,D=CONFIG.depth,S=CONFIG.storey,eaveY=CONFIG.eaveY,ridgeY=CONFIG.ridgeY;
+const hw=W/2, hd=D/2, RBx=hw-CONFIG.hipInset;
+const wx=v=>v-hw, wz=v=>hd-v;
 
-        <section class="panel">
-          <h2>Layers</h2>
-          <div class="toggle-list">
-            <label><input id="showGround" type="checkbox" checked /> Ground floor</label>
-            <label><input id="showFirst" type="checkbox" checked /> First floor</label>
-            <label><input id="showRoof" type="checkbox" checked /> Roof shell</label>
-            <label><input id="showDims" type="checkbox" checked /> Dimensions</label>
-            <label><input id="showContext" type="checkbox" checked /> Garden / drive</label>
-            <label><input id="showCutaway" type="checkbox" /> Cutaway mode</label>
-          </div>
-        </section>
+const canvas=document.getElementById('scene');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.06;
+renderer.outputEncoding=THREE.sRGBEncoding;
+const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x16140f,34,80);
+const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,0.1,220);
 
-        <section class="panel">
-          <h2>Loft Scenario</h2>
-          <div class="segmented" role="group" aria-label="Loft scenario">
-            <button class="active" data-scenario="existing">Now</button>
-            <button data-scenario="velux">Velux</button>
-            <button data-scenario="dormer">Dormer</button>
-          </div>
-          <div class="metrics" id="scenarioMetrics"></div>
-          <p class="note">This is a planning massing model, not a surveyed CAD file.</p>
-        </section>
+scene.add(new THREE.HemisphereLight(0xeaf2ff,0x352c1f,0.75));
+scene.add(new THREE.AmbientLight(0xb8c2cf,0.14));
+const sun=new THREE.DirectionalLight(0xffe6bf,2.0);
+sun.position.set(16,24,12);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-26;sun.shadow.camera.right=26;sun.shadow.camera.top=26;sun.shadow.camera.bottom=-26;
+sun.shadow.camera.near=1;sun.shadow.camera.far=80;sun.shadow.bias=-0.0004;sun.shadow.radius=4;scene.add(sun);
+const fill=new THREE.DirectionalLight(0x9fb8c4,0.4);fill.position.set(-14,8,-10);scene.add(fill);
 
-        <section class="panel">
-          <h2>Measurements</h2>
-          <div class="measure-list">
-            <label>Width <input id="houseWidth" type="number" step="0.1" value="8.3" /> m</label>
-            <label>Depth <input id="houseDepth" type="number" step="0.1" value="7.3" /> m</label>
-            <label>Ridge <input id="ridgeHeight" type="number" step="0.1" value="7.0" /> m</label>
-            <label>Storey <input id="storeyHeight" type="number" step="0.1" value="2.5" /> m</label>
-          </div>
-          <button class="text-button" id="applyMeasurements">Apply Measurements</button>
-        </section>
-      </aside>
+/* (Image-based lighting via PMREM was removed: on this r128 build it baked an
+   invalid env map that dragged all PBR surfaces to black. Richness now comes
+   from the hemisphere + ambient + sun/fill above. True IBL returns with the
+   modern-Three.js migration.) */
 
-      <section class="workspace">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">Interactive renovation model</p>
-            <h2>House Renovation Studio</h2>
-          </div>
-          <div class="actions">
-            <button id="exportImage">Export PNG</button>
-            <button id="copyBrief">Copy Render Brief</button>
-          </div>
-        </header>
 
-        <section class="canvas-wrap">
-          <canvas id="houseCanvas" width="1400" height="900" aria-label="3D model canvas"></canvas>
-          <div class="canvas-hint">Drag to orbit. Scroll to zoom. Use Front, Rear, Side, and Plan for clean views.</div>
-        </section>
+const ground=new THREE.Mesh(new THREE.CircleGeometry(46,64),new THREE.MeshStandardMaterial({color:0x20271c,roughness:1}));
+ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+const grid=new THREE.GridHelper(70,70,0x4a4234,0x322c22);
+grid.position.y=0.01;grid.material.opacity=0.3;grid.material.transparent=true;scene.add(grid);
 
-        <section class="lower-grid">
-          <article class="panel ideas">
-            <div class="panel-heading">
-              <h2>Renovation Ideas</h2>
-              <button class="icon-button" id="addIdea" title="Add idea" aria-label="Add idea">+</button>
-            </div>
-            <div id="ideasList"></div>
-          </article>
+function brickTex(){const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
+  x.fillStyle='#8d4a30';x.fillRect(0,0,256,256);const bw=64,bh=22,gap=4;
+  for(let r=0,y=0;y<256;r++,y+=bh+gap){const o=(r%2)?bw/2:0;for(let xx=-bw;xx<256;xx+=bw+gap){
+    x.fillStyle=`hsl(${13+Math.random()*8},${44+Math.random()*12}%,${36+Math.random()*10}%)`;x.fillRect(xx+o,y,bw,bh);}}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(2,2);return t;}
+function roofTex(){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+  x.fillStyle='#33363a';x.fillRect(0,0,128,128);for(let y=0;y<128;y+=12){x.fillStyle='rgba(0,0,0,.28)';x.fillRect(0,y,128,2);}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(4,3);return t;}
+function cladTex(){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+  x.fillStyle='#79331f';x.fillRect(0,0,128,128);const cw=20,ch=15;
+  for(let r=0,y=-ch;y<142;r++,y+=ch*0.7){const o=(r%2)?cw/2:0;for(let xx=-cw;xx<142;xx+=cw){
+    x.beginPath();x.arc(xx+o+cw/2,y,cw/2,0,Math.PI);
+    x.fillStyle=`hsl(${9+Math.random()*8},${52+Math.random()*14}%,${28+Math.random()*12}%)`;x.fill();
+    x.strokeStyle='rgba(0,0,0,.28)';x.stroke();}}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(2,1.4);return t;}
+const MAT={
+  brick:new THREE.MeshStandardMaterial({map:brickTex(),roughness:.95}),
+  ghost:new THREE.MeshStandardMaterial({color:0xb06b4b,transparent:true,opacity:.09,roughness:1,depthWrite:false,side:THREE.DoubleSide}),
+  roof:new THREE.MeshStandardMaterial({map:roofTex(),roughness:.85,side:THREE.DoubleSide}),
+  clad:new THREE.MeshStandardMaterial({map:cladTex(),roughness:.9,side:THREE.DoubleSide}),
+  fascia:new THREE.MeshStandardMaterial({color:0xf3efe7,roughness:.7}),
+  slab:new THREE.MeshStandardMaterial({color:0xcdc2aa,roughness:1}),
+  part:new THREE.MeshStandardMaterial({color:0xe7dcc4,roughness:1}),
+  glass:new THREE.MeshStandardMaterial({color:0x2a3a44,roughness:.16,metalness:.4,emissive:0x0d1822}),
+  frame:new THREE.MeshStandardMaterial({color:0xf4f1ea,roughness:.6}),
+  door:new THREE.MeshStandardMaterial({color:0x222a30,roughness:.5}),
+  chim:new THREE.MeshStandardMaterial({color:0x8a4a32,roughness:.95})
+};
+/* colour-management + material polish for the upgraded pipeline */
+[MAT.brick.map,MAT.roof.map,MAT.clad.map].forEach(t=>{if(t)t.encoding=THREE.sRGBEncoding;});
+MAT.brick.bumpMap=MAT.brick.map;MAT.brick.bumpScale=0.035;          // per-brick relief under raking light
+MAT.brick.envMapIntensity=0.55;MAT.clad.envMapIntensity=0.55;MAT.roof.envMapIntensity=0.5;
+MAT.fascia.envMapIntensity=0.6;MAT.chim.envMapIntensity=0.5;
+MAT.glass.roughness=0.14;MAT.glass.metalness=0.1;MAT.glass.emissive=new THREE.Color(0x10202e);
+MAT.door.metalness=0.3;MAT.door.roughness=0.4;MAT.door.envMapIntensity=1.0;
+Object.values(MAT).forEach(m=>m.needsUpdate=true);
+function quad(a,b,c,d,m){const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(new Float32Array([...a,...b,...c,...a,...c,...d]),3));
+  g.computeVertexNormals();const me=new THREE.Mesh(g,m);me.castShadow=true;me.receiveShadow=true;return me;}
+function tri(a,b,c,m){const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(new Float32Array([...a,...b,...c]),3));
+  g.computeVertexNormals();const me=new THREE.Mesh(g,m);me.castShadow=true;me.receiveShadow=true;return me;}
+function win(w,h,x,y,z,ry,bars){const grp=new THREE.Group();
+  grp.add(new THREE.Mesh(new THREE.PlaneGeometry(w+0.14,h+0.14),MAT.frame));
+  const g=new THREE.Mesh(new THREE.PlaneGeometry(w,h),MAT.glass);g.position.z=0.012;grp.add(g);
+  if(bars){const v=new THREE.Mesh(new THREE.PlaneGeometry(0.04,h),MAT.frame);v.position.z=0.02;grp.add(v);
+    const hh=new THREE.Mesh(new THREE.PlaneGeometry(w,0.04),MAT.frame);hh.position.z=0.02;grp.add(hh);}
+  grp.position.set(x,y,z);grp.rotation.y=ry||0;return grp;}
+function label(t,col){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
+  x.font='600 30px Georgia';x.textAlign='center';x.textBaseline='middle';x.fillStyle=col||'#f3ead6';x.fillText(t,128,34);
+  const tx=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,depthTest:false}));
+  s.scale.set(2.6,0.65,1);return s;}
 
-          <article class="panel render-panel">
-            <h2>Photoreal Render Brief</h2>
-            <textarea id="renderBrief" spellcheck="false"></textarea>
-            <p class="note">Use this brief with private reference photos in an image tool to generate realistic renovation visuals.</p>
-          </article>
-        </section>
-      </section>
-    </main>
+/* ===================== BUILD ===================== */
+const house=new THREE.Group();scene.add(house);
+const detail=new THREE.Group();house.add(detail);
+const garageGrp=new THREE.Group();house.add(garageGrp);
+const shellBoxes=[];
 
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-        }
-      }
-    </script>
-    <script type="module" src="./app.js"></script>
-  </body>
+/* ---- L-shaped footprint: shorter LEFT block (gable side) + deep RIGHT block (kitchen/garage side) ---- */
+const frontZ=hd, lRearZ=hd-5.6, rRearZ=-hd;        // LEFT rear 5.6m back, RIGHT (garage side) 7.3m back
+const xStep=wx(4.0), mainRidgeZ=(frontZ+rRearZ)/2; // ONE continuous ridge, centred on the deep (right) span
+(function(){
+  const lw=xStep-(-hw);                            // LEFT block, shorter 5.6m depth
+  const bl=new THREE.Mesh(new THREE.BoxGeometry(lw,eaveY,frontZ-lRearZ),MAT.brick);
+  bl.position.set((-hw+xStep)/2,eaveY/2,(frontZ+lRearZ)/2);bl.castShadow=bl.receiveShadow=true;house.add(bl);shellBoxes.push(bl);
+  const rw=hw-xStep;                               // RIGHT block, full 7.3m depth (the longer side)
+  const br=new THREE.Mesh(new THREE.BoxGeometry(rw,eaveY,frontZ-rRearZ),MAT.brick);
+  br.position.set((xStep+hw)/2,eaveY/2,(frontZ+rRearZ)/2);br.castShadow=br.receiveShadow=true;house.add(br);shellBoxes.push(br);
+})();
+
+/* floors (interior, toggle) */
+const floorGroups={};
+function buildFloor(key,baseY){const g=new THREE.Group();house.add(g);floorGroups[key]=g;
+  ROOMS[key].forEach(room=>{const [x0,d0,x1,d1]=room.r;
+    const sx=Math.abs(wx(x1)-wx(x0)),sz=Math.abs(wz(d1)-wz(d0));
+    const slab=new THREE.Mesh(new THREE.BoxGeometry(sx,0.1,sz),MAT.slab);
+    slab.position.set((wx(x0)+wx(x1))/2,baseY,(wz(d0)+wz(d1))/2);slab.receiveShadow=true;g.add(slab);
+    const wh=2.2,t=0.1;
+    [[x0,d0,x1,d0],[x0,d1,x1,d1],[x0,d0,x0,d1],[x1,d0,x1,d1]].forEach(([ax,ad,bx,bd])=>{
+      const len=Math.hypot(wx(bx)-wx(ax),wz(bd)-wz(ad));if(len<0.05)return;
+      const wall=new THREE.Mesh(new THREE.BoxGeometry(len,wh,t),MAT.part);
+      wall.position.set((wx(ax)+wx(bx))/2,baseY+wh/2,(wz(ad)+wz(bd))/2);
+      wall.rotation.y=Math.atan2(wz(bd)-wz(ad),wx(bx)-wx(ax));g.add(wall);});
+    const lab=label(room.n);lab.position.set((wx(x0)+wx(x1))/2,baseY+wh+0.5,(wz(d0)+wz(d1))/2);g.add(lab);});}
+buildFloor('ground',0.06);buildFloor('first',S+0.06);
+
+/* ---- ROOF: symmetric hipped main block + POINTY gable over the deep rear section ---- */
+const roof=new THREE.Group();house.add(roof);floorGroups['loft']=roof;
+const coreRidgeZ=(frontZ+lRearZ)/2;          // ridge centred over the main (shallower) block -> symmetric front
+(function(){
+  const inset=2.15, ridA=hw-inset;   // ridge ends at x=2.0, exactly the deep-gable centre
+  // --- main block: full-width, hipped BOTH ends (symmetric) ---
+  const RL=[-ridA,ridgeY,coreRidgeZ], RR=[ridA,ridgeY,coreRidgeZ];
+  const FLc=[-hw,eaveY,frontZ], FRc=[hw,eaveY,frontZ];
+  const BLc=[-hw,eaveY,lRearZ], BRc=[hw,eaveY,lRearZ];
+  roof.add(quad(FLc,FRc,RR,RL,MAT.roof));      // front slope (symmetric across full width)
+  roof.add(quad(BRc,BLc,RL,RR,MAT.roof));      // rear slope of the main block
+  roof.add(tri(FLc,RL,BLc,MAT.roof));          // LEFT hip
+  roof.add(tri(FRc,BRc,RR,MAT.roof));          // RIGHT hip
+  // --- deep rear section that sticks out: POINTY gable, tied forward into the main ridge (no gap) ---
+  const cxD=(xStep+hw)/2, apexYd=ridgeY, zJoin=coreRidgeZ; // apex meets the main ridge end (no gap/overlap)
+  const wL=[xStep,eaveY,zJoin], wLr=[xStep,eaveY,rRearZ];
+  const wR=[hw,eaveY,zJoin],    wRr=[hw,eaveY,rRearZ];
+  const apF=[cxD,apexYd,zJoin], apR=[cxD,apexYd,rRearZ];
+  roof.add(quad(wL,wLr,apR,apF,MAT.roof));     // left slope of the gable
+  roof.add(quad(apF,apR,wRr,wR,MAT.roof));     // right slope of the gable
+  roof.add(tri(wLr,wRr,apR,MAT.clad));         // REAR GABLE â€” pointy, tile-hung, faces the garden
+})();
+
+/* chimney on the main ridge, near centre */
+(function(){const cz=(frontZ+lRearZ)/2;
+  const c=new THREE.Mesh(new THREE.BoxGeometry(0.85,0.85,0.85),MAT.chim);
+  c.position.set(0.4,ridgeY+0.18,cz);c.castShadow=true;roof.add(c);
+  const cap=new THREE.Mesh(new THREE.BoxGeometry(0.95,0.16,0.95),MAT.chim);cap.position.set(0.4,ridgeY+0.6,cz);roof.add(cap);})();
+
+/* ---- cross-gable helper (projecting bay + gable that ties to main ridge) ---- */
+function crossGable(cx,wG,frontZ,proj,dir,clad){ // dir +1 front, -1 rear
+  const outZ=frontZ+dir*proj, x0=cx-wG/2,x1=cx+wG/2, apexY=ridgeY-0.05;
+  // bay body
+  const b=new THREE.Mesh(new THREE.BoxGeometry(wG,eaveY,proj),MAT.brick);
+  b.position.set(cx,eaveY/2,frontZ+dir*proj/2);b.castShadow=b.receiveShadow=true;house.add(b);shellBoxes.push(b);
+  // gable wall (brick, holds a window) + roof slopes back to main ridge
+  roof.add(tri([x0,eaveY,outZ],[x1,eaveY,outZ],[cx,apexY,outZ],MAT.brick));
+  const backZ=mainRidgeZ;   // run the entrance-gable roof back to the main ridge
+  roof.add(quad([x0,eaveY,outZ],[cx,apexY,outZ],[cx,apexY,backZ],[x0,eaveY,backZ],MAT.roof));
+  roof.add(quad([cx,apexY,outZ],[x1,eaveY,outZ],[x1,eaveY,backZ],[cx,apexY,backZ],MAT.roof));
+  return outZ;
+}
+const bayFrontZ = crossGable(CONFIG.bay.cx, CONFIG.bay.w, hd, CONFIG.bay.proj, +1);
+
+/* ---- REAR: deep section has a FLAT, flush back wall (no projecting middle gable) ---- */
+const lrZ = rRearZ;
+/* ---- (utility room removed â€” clean rear) ---- */
+
+/* ---- tile-hung cladding (upper floor) + windows + porch ---- */
+(function(){
+  const y0=2.65,bandH=2.35,by=y0+bandH/2;
+  const bx0=CONFIG.bay.cx-CONFIG.bay.w/2, bx1=CONFIG.bay.cx+CONFIG.bay.w/2;
+  // front wings cladding (left & right of the bay)
+  const lw=Math.abs(bx0-(-hw)); const cwL=new THREE.Mesh(new THREE.PlaneGeometry(lw,bandH),MAT.clad);cwL.position.set((-hw+bx0)/2,by,hd+0.02);detail.add(cwL);
+  const rw=Math.abs(hw-bx1);     const cwR=new THREE.Mesh(new THREE.PlaneGeometry(rw,bandH),MAT.clad);cwR.position.set((hw+bx1)/2,by,hd+0.02);detail.add(cwR);
+  // left gable-end side cladding band (left is now the shorter side)
+  const sd=frontZ-lRearZ; const sb=new THREE.Mesh(new THREE.PlaneGeometry(sd,bandH),MAT.clad);sb.position.set(-hw-0.02,by,(frontZ+lRearZ)/2);sb.rotation.y=-Math.PI/2;detail.add(sb);
+  // FRONT windows
+  detail.add(win(0.9,1.3,CONFIG.bay.cx,3.75,bayFrontZ+0.04,0,true));   // central gable, Georgian bars
+  detail.add(win(1.1,1.2,-2.8,3.75,hd+0.05));                          // left wing upper
+  detail.add(win(1.1,1.2,2.8,3.75,hd+0.05));                           // right wing upper
+  detail.add(win(1.6,1.3,-2.8,1.4,hd+0.05));                           // left wing ground
+  detail.add(win(1.6,1.3,2.8,1.4,hd+0.05));                            // right wing ground
+  // entrance: door + pitched porch canopy
+  const door=new THREE.Mesh(new THREE.PlaneGeometry(1.0,2.05),MAT.door);door.position.set(CONFIG.bay.cx,1.05,bayFrontZ+0.04);detail.add(door);
+  const cl=tri([CONFIG.bay.cx-0.85,2.25,bayFrontZ+0.05],[CONFIG.bay.cx,2.75,bayFrontZ+0.05],[CONFIG.bay.cx,2.25,bayFrontZ+0.05],MAT.roof);detail.add(cl);
+  const por=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.12,0.95),MAT.roof);por.position.set(CONFIG.bay.cx,2.5,bayFrontZ+0.5);por.rotation.x=0.2;por.castShadow=true;detail.add(por);
+  // REAR: living-room French doors in the cross-gable (left) + kitchen patio doors (right)
+  detail.add(win(1.9,2.0,2.0,1.05,lrZ-0.05,Math.PI));     // French doors (deep section, flush)
+  detail.add(win(1.1,1.2,2.0,3.75,lrZ-0.05,Math.PI));     // window above (flush)
+  detail.add(win(1.8,2.0,-2.0,1.05,lRearZ-0.05,Math.PI)); // patio doors on the main rear wall
+  detail.add(win(1.1,1.2,-2.0,3.75,lRearZ-0.05,Math.PI)); // window above
+  // LEFT gable end is blank (no windows). RIGHT side (above garage) has the two rooms' windows
+  detail.add(win(1.1,1.2,hw+0.05,3.75,1.6,Math.PI/2));    // right side upper, front room
+  detail.add(win(1.1,1.2,hw+0.05,3.75,-1.6,Math.PI/2));   // right side upper, rear room
+})();
+
+/* ---- attached single-storey garage (right end, set well back), ridge PARALLEL to the road ---- */
+(function(){const {w,d,h,setback}=CONFIG.garage;const gx=hw+w/2, fz=hd-setback, zr=fz-d, gzc=(fz+zr)/2;
+  const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),MAT.brick);b.position.set(gx,h/2,gzc);b.castShadow=b.receiveShadow=true;garageGrp.add(b);
+  // low HIPPED roof: ridge runs LEFT-RIGHT (parallel to road), slopes down to front and back, hips at the outer end
+  const rg=h+0.7,x0=gx-w/2,x1=gx+w/2,xr0=x0,xr1=x1-1.0;
+  garageGrp.add(quad([x0,h,fz],[x1,h,fz],[xr1,rg,gzc],[xr0,rg,gzc],MAT.roof));  // front slope
+  garageGrp.add(quad([x1,h,zr],[x0,h,zr],[xr0,rg,gzc],[xr1,rg,gzc],MAT.roof));  // back slope
+  garageGrp.add(tri([x1,h,fz],[x1,h,zr],[xr1,rg,gzc],MAT.roof));                // outer hip
+  garageGrp.add(tri([x0,h,zr],[x0,h,fz],[xr0,rg,gzc],MAT.roof));                // inner end (close the gap)
+  const door=new THREE.Mesh(new THREE.PlaneGeometry(2.3,2.0),MAT.door);door.position.set(gx,1.05,fz+0.04);garageGrp.add(door);})();
+
+/* (rear-left wing geometry is built with the roof above and the deep left block) */
+
+/* ============ LOFT CONVERSION (main rear slope) ============ */
+const scenario={none:new THREE.Group(),velux:new THREE.Group(),dormer:new THREE.Group()};
+Object.values(scenario).forEach(g=>{g.visible=false;house.add(g);});scenario.none.visible=true;
+(function(){[1.0,2.5].forEach(xx=>{const f=0.5,yy=eaveY+(ridgeY-eaveY)*f,zz=mainRidgeZ+(rRearZ-mainRidgeZ)*f;
+  const g=new THREE.Mesh(new THREE.PlaneGeometry(0.85,1.2),MAT.glass);g.position.set(xx,yy+0.03,zz-0.03);g.lookAt(xx,yy+1.2,zz-1.4);scenario.velux.add(g);});})();
+(function(){const dw=3.0,dh=1.5,cx=1.7,cy=5.9,cz=mainRidgeZ+(rRearZ-mainRidgeZ)*0.5;
+  const front=new THREE.Mesh(new THREE.BoxGeometry(dw,dh,0.1),MAT.brick);front.position.set(cx,cy,cz-0.95);front.castShadow=true;scenario.dormer.add(front);
+  const top=new THREE.Mesh(new THREE.BoxGeometry(dw+0.2,0.12,2.0),MAT.roof);top.position.set(cx,cy+dh/2,cz);top.castShadow=true;scenario.dormer.add(top);
+  [-dw/2,dw/2].forEach(s=>scenario.dormer.add(tri([cx+s,cy-dh/2,cz-0.95],[cx+s,cy-dh/2,cz+0.95],[cx+s,cy+dh/2,cz-0.95],MAT.brick)));
+  scenario.dormer.add(win(dw-0.7,dh-0.4,cx,cy,cz-1.0,Math.PI));})();
+
+/* ============ DIMENSIONS ============ */
+const dims=new THREE.Group();house.add(dims);
+function dimLine(a,b,t){const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a),new THREE.Vector3(...b)]);
+  dims.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:0xd8a23e})));
+  const m=[(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2];const l=label(t,'#d8a23e');l.scale.set(1.7,0.45,1);l.position.set(m[0],m[1]+0.35,m[2]);dims.add(l);}
+dimLine([-hw,-0.1,frontZ+0.6],[hw,-0.1,frontZ+0.6],W.toFixed(1)+' m');       // width
+dimLine([-hw-0.7,-0.1,frontZ],[-hw-0.7,-0.1,lRearZ],'5.6 m');                 // left depth (short)
+dimLine([hw+0.7,-0.1,frontZ],[hw+0.7,-0.1,rRearZ],'7.3 m');                   // right depth (deep, garage side)
+dimLine([-hw-0.7,0,frontZ],[-hw-0.7,ridgeY,frontZ],ridgeY.toFixed(1)+' m');   // ridge height
+
+/* ============ ORBIT CONTROLS ============ */
+const target=new THREE.Vector3(0.8,eaveY*0.45,0);
+const view={theta:-0.7,phi:1.04,r:28};const HOME={...view};
+function render(){renderer.render(scene,camera);}
+function applyCam(){view.phi=Math.max(0.18,Math.min(1.52,view.phi));view.r=Math.max(10,Math.min(56,view.r));
+  camera.position.set(target.x+view.r*Math.sin(view.phi)*Math.sin(view.theta),target.y+view.r*Math.cos(view.phi),target.z+view.r*Math.sin(view.phi)*Math.cos(view.theta));camera.lookAt(target);render();}
+let drag=false,px=0,py=0,pinch=0;
+canvas.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener('pointermove',e=>{if(!drag)return;view.theta-=(e.clientX-px)*0.006;view.phi-=(e.clientY-py)*0.006;px=e.clientX;py=e.clientY;applyCam();});
+canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointercancel',()=>drag=false);
+canvas.addEventListener('wheel',e=>{e.preventDefault();view.r*=(1+Math.sign(e.deltaY)*0.08);applyCam();},{passive:false});
+canvas.addEventListener('touchmove',e=>{if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;const d=Math.hypot(dx,dy);if(pinch)view.r*=pinch/d;pinch=d;applyCam();e.preventDefault();}},{passive:false});
+canvas.addEventListener('touchend',()=>pinch=0);
+
+/* ============ UI ============ */
+function setShell(on){shellBoxes.forEach(b=>b.material=on?MAT.brick:MAT.ghost);detail.visible=on;}
+document.querySelectorAll('[data-toggle]').forEach(el=>{el.addEventListener('click',()=>{el.classList.toggle('on');const on=el.classList.contains('on');const k=el.dataset.toggle;
+  if(k==='walls')setShell(on);else if(k==='dims')dims.visible=on;else if(k==='garage')garageGrp.visible=on;else if(floorGroups[k])floorGroups[k].visible=on;render();});});
+document.querySelectorAll('[data-scenario]').forEach(el=>{el.addEventListener('click',()=>{document.querySelectorAll('[data-scenario]').forEach(o=>o.classList.remove('on'));el.classList.add('on');
+  Object.keys(scenario).forEach(k=>scenario[k].visible=(k===el.dataset.scenario));render();});});
+document.getElementById('reset').addEventListener('click',()=>{Object.assign(view,HOME);applyCam();});
+
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);render();});
+renderer.setSize(innerWidth,innerHeight);applyCam();
+</script>
+</body>
 </html>
+
